@@ -68,12 +68,13 @@ pipeline {
             }
             steps {
                 dir("${env.WORKSPACE}/todo"){
-                    script{
+                    ansiColor('xterm') {
+                        script{
                         E2E_TEST_STATUS = sh (
                             script: "docker run --tty --name todo-e2e-test todo-main test:e2e --headless",
                             returnStatus: true
                         ) == 0
-                    }
+                    }}
                 }
             }
         }
