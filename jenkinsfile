@@ -12,7 +12,7 @@ pipeline {
                }
            }
        }
-        stage('app build stage') {
+        stage('app build stage and archive build-output') {
             steps{
                 dir("${env.WORKSPACE}/todo"){
                     script{
@@ -23,6 +23,12 @@ pipeline {
                             ) == 0
                         }
                     }
+                }
+            }
+            post { 
+                always { 
+                    sh 'docker logs todo-build > build-output.log'
+                    archiveArtifacts artifacts: 'build-output.log'
                 }
             }
         }
