@@ -1,6 +1,7 @@
 def TEST_STATUS = false
 def BUILD_STATUS = false
 def LINT_STATUS = false
+def E2E_TEST_STATUS = false
 pipeline {
    agent any
    stages {
@@ -61,9 +62,24 @@ pipeline {
                 }
             }
         }
-        stage('app running stage') {
+        stage('app e2e testing stage') {
             when{
                 expression { TEST_STATUS }
+            }
+            steps {
+                dir("${env.WORKSPACE}/todo"){
+                    script{
+                        E2E_TEST_STATUS = sh (
+                            script: "docker run --tty --name todo-e2e-test todo-main test:e2e --headless",
+                            returnStatus: true
+                        ) == 0
+                    }
+                }
+            }
+        }
+        stage('app running stage') {
+            when{
+                expression { E2E_TEST_STATUS }
             }
             steps {
                 dir("${env.WORKSPACE}/todo"){
