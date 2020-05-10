@@ -12,4 +12,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 8080
-ENTRYPOINT ["yarn", ${CMD}]
+ENTRYPOINT ["yarn"]
