@@ -20,16 +20,18 @@ pipeline {
        }
         stage('app build stage') {
             steps{
-                sh 'ls'
-                script{
-                    withEnv(["CMD=build"]) {
-                        sh 'docker build -t todo-build .'
-                        BUILD_STATUS = sh (
-                            script: "docker run -it todo-build",
-                            returnStatus: true
-                        ) == 0
+                dir("${env.WORKSPACE}/todo"){
+                    sh 'ls'
+                    script{
+                        withEnv(["CMD=build"]) {
+                            sh 'docker build -t todo-build .'
+                            BUILD_STATUS = sh (
+                                script: "docker run -it todo-build",
+                                returnStatus: true
+                            ) == 0
+                        }
+                        sh 'docker images'
                     }
-                    sh 'docker images'
                 }
             }
         }
@@ -38,15 +40,17 @@ pipeline {
                 expression { BUILD_STATUS }
             }
             steps {
-                script{
-                    withEnv(["CMD=test"]) {
-                        sh 'docker build -t todo-test .'
-                        TEST_STATUS = sh (
-                            script: "docker run -it todo-test",
-                            returnStatus: true
-                        ) == 0
+                dir("${env.WORKSPACE}/todo"){
+                    script{
+                        withEnv(["CMD=test"]) {
+                            sh 'docker build -t todo-test .'
+                            TEST_STATUS = sh (
+                                script: "docker run -it todo-test",
+                                returnStatus: true
+                            ) == 0
+                        }
+                        sh 'docker images'
                     }
-                    sh 'docker images'
                 }
             }
         }
