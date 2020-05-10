@@ -1,0 +1,37 @@
+def TEST_STATUS = false
+def BUILD_STATUS = false
+pipeline {
+   agent any
+   stages {
+       stage('pull app from SC'){
+           git url: 'https://github.com/dobromir-hristov/todo-app.git'
+       }
+        stage('app build stage') {
+            script{
+                    withEnv(["CMD=test"]) {
+                        BUILD_STATUS = sh (
+                            script: "docker-compose -p test up --build --abort-on-container-exit",
+                            returnStatus: true
+                        ) == 0
+                    }
+                    sh 'ld'
+                }
+            
+        }
+        stage('app testing stage') {
+            when{
+                expression { BUILD_STATUS }
+            }
+            steps {
+                script{
+                    withEnv(["CMD=test"]) {
+                        TEST_STATUS = sh (
+                            script: "docker-compose -p test up --build --abort-on-container-exit",
+                            returnStatus: true
+                        ) == 0
+                    }
+                }
+            }
+        }
+    }
+}
