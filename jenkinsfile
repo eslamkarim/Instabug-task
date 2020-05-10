@@ -3,19 +3,12 @@ def BUILD_STATUS = false
 pipeline {
    agent any
    stages {
-       stage('test if docker file exist'){
-           steps{
-                   sh 'ls'
-           }
-       }
        stage('pull app from SC'){
            steps{
                dir('todo') {
                    git url: 'https://github.com/dobromir-hristov/todo-app.git'
                    sh 'mv ../Dockerfile .'
-                   sh 'ls'
                }
-                   sh 'ls'
            }
        }
         stage('app build stage') {
@@ -24,7 +17,7 @@ pipeline {
                     sh 'ls'
                     script{
                         withEnv(["CMD=build"]) {
-                            sh 'docker build -t todo-build .'
+                            sh 'docker build --no-cache -t todo-build .'
                             BUILD_STATUS = sh (
                                 script: "docker run -it todo-build",
                                 returnStatus: true
