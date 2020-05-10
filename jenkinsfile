@@ -69,7 +69,7 @@ pipeline {
                 dir("${env.WORKSPACE}/todo"){
                     script{
                         sh (
-                            script: "docker run --tty -d --name todo-test -p 8000:8080 todo-main serve"
+                            script: "docker run --tty -d --name todo-dev -p 8000:8080 todo-main serve"
                         )
                     }
                 }
