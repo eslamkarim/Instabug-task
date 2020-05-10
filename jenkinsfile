@@ -5,16 +5,13 @@ pipeline {
    stages {
        stage('pull app from SC'){
            steps{
-               step{
                    git url: 'https://github.com/dobromir-hristov/todo-app.git'
-               }
-               step{
                    sh 'ls'
-               }
            }
        }
         stage('app build stage') {
-            script{
+            steps{
+                script{
                     withEnv(["CMD=test"]) {
                         BUILD_STATUS = sh (
                             script: "",
@@ -23,7 +20,7 @@ pipeline {
                     }
                     sh 'ld'
                 }
-            
+            }
         }
         stage('app testing stage') {
             when{
