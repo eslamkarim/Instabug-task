@@ -1,5 +1,6 @@
 def TEST_STATUS = false
 def BUILD_STATUS = false
+def LINT_STATUS = false
 pipeline {
    agent any
    stages {
@@ -16,12 +17,10 @@ pipeline {
             steps{
                 dir("${env.WORKSPACE}/todo"){
                     script{
-                        withEnv(["CMD=build"]) {
-                            BUILD_STATUS = sh (
-                                script: "docker run --tty --name todo-build todo-main build",
-                                returnStatus: true
-                            ) == 0
-                        }
+                        BUILD_STATUS = sh (
+                            script: "docker run --tty --name todo-build todo-main build",
+                            returnStatus: true
+                        ) == 0
                     }
                 }
             }
@@ -33,35 +32,49 @@ pipeline {
             }
         }
         stage('app lint stage') {
+            when{
+                expression { BUILD_STATUS }
+            }
             steps{
                 dir("${env.WORKSPACE}/todo"){
                     script{
-                        withEnv(["CMD=build"]) {
-                            BUILD_STATUS = sh (
-                                script: "docker run --tty --name todo-lint todo-main lint",
-                                returnStatus: true
-                            ) == 0
-                        }
+                        LINT_STATUS = sh (
+                            script: "docker run --tty --name todo-lint todo-main lint",
+                            returnStatus: true
+                        ) == 0
                     }
                 }
             }
         }
-        stage('app testing stage') {
+        stage('app unit testing stage') {
             when{
-                expression { BUILD_STATUS }
+                expression { LINT_STATUS }
             }
             steps {
                 dir("${env.WORKSPACE}/todo"){
                     script{
-                        withEnv(["CMD=test"]) {
-                            TEST_STATUS = sh (
-                                script: "docker run --tty --name todo-test todo-main test:unit",
-                                returnStatus: true
-                            ) == 0
-                        }
+                        TEST_STATUS = sh (
+                            script: "docker run --tty --name todo-test todo-main test:unit",
+                            returnStatus: true
+                        ) == 0
                     }
                 }
             }
+        }
+        stage('app running stage') {
+            when{
+                expression { TEST_STATUS }
+            }
+            steps {
+                dir("${env.WORKSPACE}/todo"){
+                    script{
+                        sh (
+                            script: "docker run --tty -d --name todo-test -p 8000:8080 todo-main serve"
+                        )
+                    }
+                }
+            }
+            
         }
     }
 }
