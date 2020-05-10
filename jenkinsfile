@@ -10,13 +10,17 @@ pipeline {
        }
        stage('pull app from SC'){
            steps{
+               dir('todo') {
                    git url: 'https://github.com/dobromir-hristov/todo-app.git'
                    sh 'mv ../Dockerfile .'
+                   sh 'ls'
+               }
                    sh 'ls'
            }
        }
         stage('app build stage') {
             steps{
+                sh 'ls'
                 script{
                     withEnv(["CMD=build"]) {
                         sh 'docker build -t todo-build .'
