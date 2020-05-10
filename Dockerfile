@@ -13,3 +13,4 @@ COPY . .
 
 EXPOSE 8080
 ENTRYPOINT ["yarn"]
+CMD "serve"
