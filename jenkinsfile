@@ -18,7 +18,7 @@ pipeline {
                             returnStatus: true
                         ) == 0
                     }
-                    sh 'ld'
+                    sh 'ls'
                 }
             }
         }
