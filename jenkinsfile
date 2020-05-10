@@ -8,22 +8,20 @@ pipeline {
                dir('todo') {
                    git url: 'https://github.com/dobromir-hristov/todo-app.git'
                    sh 'mv ../Dockerfile .'
+                   sh 'docker build --no-cache -t todo-main .'
                }
            }
        }
         stage('app build stage') {
             steps{
                 dir("${env.WORKSPACE}/todo"){
-                    sh 'ls'
                     script{
                         withEnv(["CMD=build"]) {
-                            sh 'docker build --no-cache -t todo-build .'
                             BUILD_STATUS = sh (
-                                script: "docker run -it todo-build",
+                                script: "docker run -it --name todo-build todo-main build",
                                 returnStatus: true
                             ) == 0
                         }
-                        sh 'docker images'
                     }
                 }
             }
@@ -36,13 +34,11 @@ pipeline {
                 dir("${env.WORKSPACE}/todo"){
                     script{
                         withEnv(["CMD=test"]) {
-                            sh 'docker build -t todo-test .'
                             TEST_STATUS = sh (
-                                script: "docker run -it todo-test",
+                                script: "docker run -it --name todo-test todo-main test",
                                 returnStatus: true
                             ) == 0
                         }
-                        sh 'docker images'
                     }
                 }
             }
