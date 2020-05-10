@@ -26,6 +26,20 @@ pipeline {
                 }
             }
         }
+        stage('app lint stage') {
+            steps{
+                dir("${env.WORKSPACE}/todo"){
+                    script{
+                        withEnv(["CMD=build"]) {
+                            BUILD_STATUS = sh (
+                                script: "docker run --tty --name todo-build todo-main lint",
+                                returnStatus: true
+                            ) == 0
+                        }
+                    }
+                }
+            }
+        }
         stage('app testing stage') {
             when{
                 expression { BUILD_STATUS }
@@ -35,7 +49,7 @@ pipeline {
                     script{
                         withEnv(["CMD=test"]) {
                             TEST_STATUS = sh (
-                                script: "docker run -it --name todo-test todo-main test",
+                                script: "docker run --tty --name todo-test todo-main test:unit",
                                 returnStatus: true
                             ) == 0
                         }
