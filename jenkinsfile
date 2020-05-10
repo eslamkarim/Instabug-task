@@ -32,7 +32,7 @@ pipeline {
                     script{
                         withEnv(["CMD=build"]) {
                             BUILD_STATUS = sh (
-                                script: "docker run --tty --name todo-build todo-main lint",
+                                script: "docker run --tty --name todo-lint todo-main lint",
                                 returnStatus: true
                             ) == 0
                         }
