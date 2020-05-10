@@ -27,8 +27,8 @@ pipeline {
             }
             post { 
                 always { 
-                    sh 'docker logs todo-build > build-output.log'
-                    archiveArtifacts artifacts: 'build-output.log'
+                    sh 'docker logs todo-build > build-output_${BUILD_NUMBER}.log'
+                    archiveArtifacts artifacts: 'build-output_${BUILD_NUMBER}.log'
                 }
             }
         }
