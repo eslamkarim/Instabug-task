@@ -6,19 +6,21 @@ pipeline {
        stage('pull app from SC'){
            steps{
                    git url: 'https://github.com/dobromir-hristov/todo-app.git'
+                   sh 'mv ../Dockerfile .'
                    sh 'ls'
            }
        }
         stage('app build stage') {
             steps{
                 script{
-                    withEnv(["CMD=test"]) {
+                    withEnv(["CMD=build"]) {
+                        sh 'docker build -t todo-build .'
                         BUILD_STATUS = sh (
-                            script: "",
+                            script: "docker run -it todo-build",
                             returnStatus: true
                         ) == 0
                     }
-                    sh 'ls'
+                    sh 'docker images'
                 }
             }
         }
@@ -29,11 +31,13 @@ pipeline {
             steps {
                 script{
                     withEnv(["CMD=test"]) {
+                        sh 'docker build -t todo-test .'
                         TEST_STATUS = sh (
-                            script: "docker-compose -p test up --build --abort-on-container-exit",
+                            script: "docker run -it todo-test",
                             returnStatus: true
                         ) == 0
                     }
+                    sh 'docker images'
                 }
             }
         }
