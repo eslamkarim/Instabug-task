@@ -40,7 +40,7 @@ pipeline {
                 dir("${env.WORKSPACE}/todo"){
                     script{
                         LINT_STATUS = sh (
-                            script: "docker run --tty --name todo-lint todo-main lint",
+                            script: "docker run --rm --tty --name todo-lint todo-main lint",
                             returnStatus: true
                         ) == 0
                     }
@@ -55,7 +55,7 @@ pipeline {
                 dir("${env.WORKSPACE}/todo"){
                     script{
                         TEST_STATUS = sh (
-                            script: "docker run --tty --name todo-test todo-main test:unit",
+                            script: "docker run --rm  --tty --name todo-test todo-main test:unit",
                             returnStatus: true
                         ) == 0
                     }
@@ -71,7 +71,7 @@ pipeline {
                     ansiColor('xterm') {
                         script{
                         E2E_TEST_STATUS = sh (
-                            script: "docker run --tty --name todo-e2e-test todo-main test:e2e --headless",
+                            script: "docker run --rm --tty --name todo-e2e-test todo-main test:e2e --headless",
                             returnStatus: true
                         ) == 0
                     }}
